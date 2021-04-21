@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.NetworkInfo
 import android.net.wifi.WifiManager
 import android.net.wifi.p2p.WifiP2pManager
 import android.net.wifi.p2p.WifiP2pManager.Channel
@@ -51,7 +52,16 @@ public class WifiDirectBroadcastReceiver(
             }
         }
         else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION == action) {
-            // 3
+            if (mManager == null) {
+                return
+            }
+            var networkInfo: NetworkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO)!!
+            if (networkInfo.isConnected) {
+                mManager.requestConnectionInfo(mChannel, mActivity.connectionInfoListener)
+            }
+            else {
+                mActivity.connectionStatus.text = "Device Disconnected"
+            }
         }
         else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION == action) {
             // 4
